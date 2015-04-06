@@ -1,0 +1,14 @@
+name: Dusk
+description: Highlight blocks that are not spawn proof
+author: StarTux
+version: 0.1
+main: com.winthier.dusk.DuskPlugin
+commands:
+  dusk:
+    description: Highlight dark spots
+    usage: /<command> wool|snow
+    permission: dusk.dusk
+permissions:
+  dusk.dusk:
+    description: Use the /dusk command to highlight dark spots
+    default: op
