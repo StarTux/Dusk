@@ -1,2 +1,2 @@
 radius: 32
-blocks-per-tick: 1024
+blocks-per-tick: 8192

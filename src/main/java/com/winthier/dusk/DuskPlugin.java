@@ -1,62 +1,62 @@
 package com.winthier.dusk;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class DuskPlugin extends JavaPlugin {
-    public final Map<Player, DuskTask> tasks = new HashMap<Player, DuskTask>();
-    private int blocksPerTick = 1024;
-    private int radius = 32;
+public final class DuskPlugin extends JavaPlugin {
+    public final Map<UUID, DuskTask> tasks = new HashMap<>();
+    private int blocksPerTick;
+    private int radius;
 
     @Override
     public void onEnable() {
         reloadConfig();
-        radius = getConfig().getInt("radius", 16);
-        blocksPerTick = getConfig().getInt("blocks-per-tick", 1024);
+        radius = getConfig().getInt("radius", 32);
+        blocksPerTick = getConfig().getInt("blocks-per-tick", 8192);
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
 
     @Override
     public void onDisable() {
-        for (DuskTask task : tasks.values()) {
-            try { task.cancel(); } catch (IllegalStateException e) {}
+        for (DuskTask task : new ArrayList<>(tasks.values())) {
+            task.stop();
         }
         tasks.clear();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String args[]) {
+    public boolean onCommand(CommandSender sender, Command command,
+                             String label, String[] args) {
         Player player = null;
-        if (sender instanceof Player) player = (Player)sender;
+        if (sender instanceof Player) player = (Player) sender;
         if (player == null) {
             sender.sendMessage("Player expected");
             return true;
         }
-        if (args.length > 1) return false;
-        if (tasks.get(player) != null) {
-            player.sendMessage("" + ChatColor.RED + "Already highlighting blocks for you. Please wait a moment.");
+        if (args.length != 0) return false;
+        if (tasks.get(player.getUniqueId()) != null) {
+            player.sendMessage("" + ChatColor.RED
+                               + "[Dusk] Already highlighting blocks for you."
+                               + " Please wait a moment.");
             return true;
         }
-        DuskBlock duskBlock = DuskBlock.WOOL;
-        if (args.length == 1) {
-            duskBlock = DuskBlock.fromString(args[0]);
-            if (duskBlock == null) return false;
-        }
-        showDusk(player, duskBlock);
-        player.sendMessage("" + ChatColor.AQUA + "Highlighting dark spots with " + duskBlock.title + ".");
-        player.sendMessage("" + duskBlock.nightColor + "[Not safe only at night]" + ChatColor.AQUA + " " + duskBlock.dayColor + "[Not safe any time]" + ChatColor.RESET + ".");
+        showDusk(player);
+        player.sendMessage("" + ChatColor.DARK_RED
+                           + "[Dusk] Highlighting dark spots with barriers.");
         return true;
     }
 
-    public void showDusk(Player player, DuskBlock duskBlock) {
-        DuskTask task = new DuskTask(this, player, duskBlock, radius, blocksPerTick);
-        tasks.put(player, task);
+    void showDusk(Player player) {
+        DuskTask task = new DuskTask(this, player, radius, blocksPerTick);
+        tasks.put(player.getUniqueId(), task);
         task.start();
     }
 }
