@@ -1,27 +1,36 @@
 package com.winthier.dusk;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class DuskPlugin extends JavaPlugin {
+public final class DuskPlugin extends JavaPlugin implements Listener {
     public final Map<UUID, DuskTask> tasks = new HashMap<>();
     private int blocksPerTick;
     private int radius;
+    Metadata meta = new Metadata(this);
+    static final String AUDIT = "dusk.audit";
 
     @Override
     public void onEnable() {
         reloadConfig();
+        saveDefaultConfig();
         radius = getConfig().getInt("radius", 32);
         blocksPerTick = getConfig().getInt("blocks-per-tick", 8192);
-        getConfig().options().copyDefaults(true);
-        saveConfig();
+        getServer().getPluginManager().registerEvents(this, this);
     }
 
     @Override
@@ -41,7 +50,10 @@ public final class DuskPlugin extends JavaPlugin {
             sender.sendMessage("Player expected");
             return true;
         }
-        if (args.length != 0) return false;
+        if (args.length > 0) {
+            return onCommand(player, args[0],
+                             Arrays.copyOfRange(args, 1, args.length));
+        }
         if (tasks.get(player.getUniqueId()) != null) {
             player.sendMessage("" + ChatColor.RED
                                + "[Dusk] Already highlighting blocks for you."
@@ -54,9 +66,43 @@ public final class DuskPlugin extends JavaPlugin {
         return true;
     }
 
+    boolean onCommand(Player player, String cmd, String[] args) {
+        switch (cmd) {
+        case "audit":
+            if (args.length != 0) return false;
+            if (meta.has(player, AUDIT)) {
+                meta.remove(player, AUDIT);
+                player.sendMessage(ChatColor.YELLOW + "Audit mode disabled");
+            } else {
+                meta.set(player, AUDIT, true);
+                player.sendMessage(ChatColor.YELLOW + "Audit mode enabled");
+            }
+            return true;
+        default: return false;
+        }
+    }
+
     void showDusk(Player player) {
         DuskTask task = new DuskTask(this, player, radius, blocksPerTick);
         tasks.put(player.getUniqueId(), task);
         task.start();
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) return;
+        Location loc = event.getEntity().getLocation();
+        String msg = loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
+        meta.set(event.getEntity(), AUDIT, msg);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    void onEntityDeath(EntityDeathEvent event) {
+        Player killer = event.getEntity().getKiller();
+        if (killer == null) return;
+        if (!meta.has(killer, AUDIT)) return;
+        String msg = meta.get(event.getEntity(), AUDIT, String.class);
+        if (msg == null) return;
+        killer.sendMessage(ChatColor.YELLOW + "[Dusk] Audit: Entity spawned at " + msg + ".");
     }
 }
