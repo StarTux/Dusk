@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Bisected;
@@ -92,10 +93,10 @@ final class DuskTask extends BukkitRunnable {
         if (block.isEmpty()) return;
         if (block.isLiquid()) return;
         final Material mat = block.getType();
-        if (mat.isTransparent()) return;
+        if (!Tag.VALID_SPAWN.isTagged(mat)) return;
         final Block above = block.getRelative(0, 1, 0);
-        if (!above.isEmpty()) {
-            final Material aboveMat = above.getType();
+        final Material aboveMat = above.getType();
+        if (!Tag.DOORS.isTagged(aboveMat) && !above.isEmpty()) {
             if (above.isLiquid()) return;
             if (aboveMat.isOccluding()) return;
             if (aboveMat.isSolid()) return;
