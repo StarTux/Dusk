@@ -50,20 +50,11 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
             sender.sendMessage("Player expected");
             return true;
         }
-        if (args.length > 0) {
-            return onCommand(player, args[0],
-                             Arrays.copyOfRange(args, 1, args.length));
+        if (args.length == 0) {
+            return showDusk(player, 7);
         }
-        if (tasks.get(player.getUniqueId()) != null) {
-            player.sendMessage("" + ChatColor.RED
-                               + "[Dusk] Already highlighting blocks for you."
-                               + " Please wait a moment.");
-            return true;
-        }
-        showDusk(player);
-        player.sendMessage("" + ChatColor.DARK_RED
-                           + "[Dusk] Highlighting dark spots with barriers.");
-        return true;
+        return onCommand(player, args[0],
+                         Arrays.copyOfRange(args, 1, args.length));
     }
 
     boolean onCommand(Player player, String cmd, String[] args) {
@@ -78,14 +69,27 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.YELLOW + "Audit mode enabled");
             }
             return true;
+        case "0":
+            if (args.length != 0) return false;
+            return showDusk(player, 0);
         default: return false;
         }
     }
 
-    void showDusk(Player player) {
-        DuskTask task = new DuskTask(this, player, radius, blocksPerTick);
-        tasks.put(player.getUniqueId(), task);
+    boolean showDusk(Player player, final int limit) {
+        UUID uuid = player.getUniqueId();
+        if (tasks.get(uuid) != null) {
+            player.sendMessage("" + ChatColor.RED
+                               + "[Dusk] Already highlighting blocks for you."
+                               + " Please wait a moment.");
+            return true;
+        }
+        DuskTask task = new DuskTask(this, player, radius, blocksPerTick, limit);
+        tasks.put(uuid, task);
         task.start();
+        player.sendMessage("" + ChatColor.DARK_RED
+                           + "[Dusk] Highlighting dark spots with barriers.");
+        return true;
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

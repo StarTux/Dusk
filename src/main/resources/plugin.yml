@@ -10,7 +10,10 @@ softdepend: []
 commands:
   dusk:
     description: Highlight dark spots
-    usage: '/dusk'
+    usage: |-
+      /dusk - Highlight dark spots
+      /dusk 0 - Highlight completely dark spots
+      /dusk audit - Print killed mob spawn location
     permission: dusk.dusk
 permissions:
   dusk.dusk:
