@@ -94,7 +94,14 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (event.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) return;
+        switch (event.getSpawnReason()) {
+        case NATURAL:
+        case REINFORCEMENTS:
+        case VILLAGE_INVASION:
+            break;
+        default:
+            return;
+        }
         Location loc = event.getEntity().getLocation();
         String msg = loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
         meta.set(event.getEntity(), AUDIT, msg);
