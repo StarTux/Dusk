@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -93,27 +92,14 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onCreatureSpawn(CreatureSpawnEvent event) {
-        switch (event.getSpawnReason()) {
-        case NATURAL:
-        case REINFORCEMENTS:
-        case VILLAGE_INVASION:
-            break;
-        default:
-            return;
-        }
-        Location loc = event.getEntity().getLocation();
-        String msg = loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
-        meta.set(event.getEntity(), AUDIT, msg);
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     void onEntityDeath(EntityDeathEvent event) {
         Player killer = event.getEntity().getKiller();
         if (killer == null) return;
         if (!meta.has(killer, AUDIT)) return;
-        String msg = meta.get(event.getEntity(), AUDIT, String.class);
-        if (msg == null) return;
-        killer.sendMessage(ChatColor.YELLOW + "[Dusk] Audit: Entity spawned at " + msg + ".");
+        Location origin = event.getEntity().getOrigin();
+        if (origin == null) return;
+        String name = event.getEntity().getType().name().toLowerCase().replace("_", " ");
+        killer.sendMessage(ChatColor.YELLOW + "[Dusk] Audit: " + name + " spawned at "
+                           + ChatColor.WHITE + origin.getBlockX() + " " + origin.getBlockY() + " " + origin.getBlockZ() + ".");
     }
 }
