@@ -96,7 +96,7 @@ final class DuskTask extends BukkitRunnable {
         if (block.isEmpty()) return;
         if (block.isLiquid()) return;
         final Material mat = block.getType();
-        if (mat.isTransparent()) return;
+        if (!mat.isOccluding()) return;
         final Block above = block.getRelative(0, 1, 0);
         final Material aboveMat = above.getType();
         if (!Tag.DOORS.isTagged(aboveMat) && !above.isEmpty()) {
