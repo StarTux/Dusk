@@ -50,7 +50,7 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
             return true;
         }
         if (args.length == 0) {
-            return showDusk(player, 7);
+            return showDusk(player);
         }
         return onCommand(player, args[0],
                          Arrays.copyOfRange(args, 1, args.length));
@@ -68,14 +68,11 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
                 player.sendMessage(ChatColor.YELLOW + "Audit mode enabled");
             }
             return true;
-        case "0":
-            if (args.length != 0) return false;
-            return showDusk(player, 0);
         default: return false;
         }
     }
 
-    boolean showDusk(Player player, final int limit) {
+    boolean showDusk(Player player) {
         UUID uuid = player.getUniqueId();
         if (tasks.get(uuid) != null) {
             player.sendMessage("" + ChatColor.RED
@@ -83,7 +80,7 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
                                + " Please wait a moment.");
             return true;
         }
-        DuskTask task = new DuskTask(this, player, radius, blocksPerTick, limit);
+        DuskTask task = new DuskTask(this, player, radius, blocksPerTick);
         tasks.put(uuid, task);
         task.start();
         player.sendMessage("" + ChatColor.DARK_RED

@@ -24,16 +24,13 @@ final class DuskTask extends BukkitRunnable {
     final int cx;
     final int cy;
     final int cz;
-    final int limit;
     // State
     int dx;
     int dy;
     int dz;
     int blockCount;
 
-    DuskTask(final DuskPlugin plugin, final Player player,
-             final int radius, final int blocksPerTick,
-             final int limit) {
+    DuskTask(final DuskPlugin plugin, final Player player, final int radius, final int blocksPerTick) {
         this.plugin = plugin;
         this.player = player;
         this.world = player.getWorld();
@@ -46,7 +43,6 @@ final class DuskTask extends BukkitRunnable {
         dz = -radius;
         this.radius = radius;
         this.blocksPerTick = blocksPerTick;
-        this.limit = limit;
     }
 
     void start() {
@@ -123,12 +119,9 @@ final class DuskTask extends BukkitRunnable {
         if (bd instanceof org.bukkit.block.data.type.Leaves) return;
         if (bd instanceof org.bukkit.block.data.type.Fence) return;
         final int blockLight = (int) above.getLightFromBlocks();
-        if (blockLight > limit) return;
-        player.spawnParticle(Particle.BARRIER,
-                             block.getLocation().add(0.5, 1.5, 0.5),
-                             1,
-                             0, 0, 0,
-                             0.0);
+        if (blockLight > 0) return;
+        player.spawnParticle(Particle.BLOCK_MARKER, block.getLocation().add(0.5, 1.5, 0.5),
+                             1, 0.0, 0.0, 0.0, 0.0, Material.BARRIER.createBlockData());
         blockCount++;
     }
 }
