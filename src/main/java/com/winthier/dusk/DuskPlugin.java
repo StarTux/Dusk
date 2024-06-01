@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,6 +14,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.textOfChildren;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class DuskPlugin extends JavaPlugin implements Listener {
     public final Map<UUID, DuskTask> tasks = new HashMap<>();
@@ -62,10 +64,10 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
             if (args.length != 0) return false;
             if (meta.has(player, AUDIT)) {
                 meta.remove(player, AUDIT);
-                player.sendMessage(ChatColor.YELLOW + "Audit mode disabled");
+                player.sendMessage(text("Audit mode disabled", YELLOW));
             } else {
                 meta.set(player, AUDIT, true);
-                player.sendMessage(ChatColor.YELLOW + "Audit mode enabled");
+                player.sendMessage(text("Audit mode enabled", YELLOW));
             }
             return true;
         default: return false;
@@ -75,16 +77,13 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
     boolean showDusk(Player player) {
         UUID uuid = player.getUniqueId();
         if (tasks.get(uuid) != null) {
-            player.sendMessage("" + ChatColor.RED
-                               + "[Dusk] Already highlighting blocks for you."
-                               + " Please wait a moment.");
+            player.sendMessage(text("[Dusk] Already highlighting blocks for you. Please wait a moment.", RED));
             return true;
         }
         DuskTask task = new DuskTask(this, player, radius, blocksPerTick);
         tasks.put(uuid, task);
         task.start();
-        player.sendMessage("" + ChatColor.DARK_RED
-                           + "[Dusk] Highlighting dark spots with barriers.");
+        player.sendMessage(text("[Dusk] Highlighting dark spots with barriers", DARK_RED));
         return true;
     }
 
@@ -96,7 +95,7 @@ public final class DuskPlugin extends JavaPlugin implements Listener {
         Location origin = event.getEntity().getOrigin();
         if (origin == null) return;
         String name = event.getEntity().getType().name().toLowerCase().replace("_", " ");
-        killer.sendMessage(ChatColor.YELLOW + "[Dusk] Audit: " + name + " spawned at "
-                           + ChatColor.WHITE + origin.getBlockX() + " " + origin.getBlockY() + " " + origin.getBlockZ() + ".");
+        killer.sendMessage(textOfChildren(text("[Dusk] Audit: " + name + " spawned at ", YELLOW),
+                                          text(origin.getBlockX() + " " + origin.getBlockY() + " " + origin.getBlockZ() + ".")));
     }
 }

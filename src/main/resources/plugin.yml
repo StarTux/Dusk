@@ -1,19 +1,26 @@
 main: com.winthier.dusk.DuskPlugin
 name: Dusk
+
 version: 0.1
-api-version: 1.13
+api-version: 1.18
+
 description: Highlight blocks that are not spawn proof
 author: StarTux
 website: https://cavetale.com
+
 depend: []
 softdepend: []
+
 commands:
+
   dusk:
     description: Highlight dark spots
     usage: |-
       /dusk - Highlight dark spots
     permission: dusk.dusk
+
 permissions:
+
   dusk.dusk:
     description: Use the /dusk command to highlight dark spots
     default: op

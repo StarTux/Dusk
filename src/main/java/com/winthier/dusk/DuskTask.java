@@ -1,6 +1,5 @@
 package com.winthier.dusk;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -13,6 +12,8 @@ import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.DARK_RED;
 
 final class DuskTask extends BukkitRunnable {
     final DuskPlugin plugin;
@@ -81,9 +82,7 @@ final class DuskTask extends BukkitRunnable {
             }
             dz = -radius;
         }
-        player.sendMessage("" + ChatColor.DARK_RED + "[Dusk] "
-                           + blockCount + " blocks highlighted within "
-                           + radius + " blocks.");
+        player.sendMessage(text("[Dusk] " + blockCount + " blocks highlighted within " + radius + " blocks", DARK_RED));
         stop();
     }
 
