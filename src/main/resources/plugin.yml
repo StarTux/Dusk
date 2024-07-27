@@ -2,7 +2,7 @@ main: com.winthier.dusk.DuskPlugin
 name: Dusk
 
 version: 0.1
-api-version: 1.18
+api-version: '1.21'
 
 description: Highlight blocks that are not spawn proof
 author: StarTux
