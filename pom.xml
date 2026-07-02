@@ -1,56 +1,29 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>com.cavetale.pom</groupId>
+    <artifactId>cavetale-pom-base</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
   <groupId>com.winthier.dusk</groupId>
   <artifactId>dusk</artifactId>
   <version>0.1</version>
 
   <name>Dusk</name>
-  <packaging>jar</packaging>
   <url>http://github.com/StarTux/Dusk</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <repositories>
+  <packaging>jar</packaging>
 
-    <!-- Paper Repo -->
-    <repository>
-      <id>papermc</id>
-      <url>https://repo.papermc.io/repository/maven-public/</url>
-    </repository>
-
-  </repositories>
   <dependencies>
 
     <!-- Paper API -->
     <dependency>
       <groupId>io.papermc.paper</groupId>
       <artifactId>paper-api</artifactId>
-      <version>1.21.11-R0.1-SNAPSHOT</version> <!-- Paper Version -->
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
 
   </dependencies>
-  <build>
-    <finalName>${project.name}</finalName>
-    <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
-        <configuration>
-          <source>21</source>
-          <target>21</target>
-          <showDeprecation>true</showDeprecation>
-          <showWarnings>true</showWarnings>
-          <compilerArgs>
-            <arg>-Xlint:unchecked</arg>
-          </compilerArgs>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
 </project>
